@@ -1,0 +1,25 @@
+/* 
+
+.primary{
+    background-color: purple;
+}
+
+.secondary{
+    background-color: black;
+}
+
+.danger{
+    background-color: red;
+}
+
+.button{
+    width: 8rem;
+    height: 4rem;
+} */
+
+
+.container{
+    display: flex;
+    flex-direction: row;
+}
+
