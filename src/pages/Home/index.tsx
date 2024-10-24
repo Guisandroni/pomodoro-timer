@@ -1,37 +1,42 @@
 import { Play } from "phosphor-react";
-import {  HomeContainer } from "./styles";
+import {  ButtonHome, ClockContainer, HomeContainer, SpanTwoPoints, SpanMinutes, FormContainer, DivContainer, MinutesInput, WorkInput } from "./styles";
 
 
 export function Home(){
     return(
 
         <HomeContainer>
-        <form action="">
-            <div>
-                <label htmlFor="task">I work in</label>
-                <input id='task' placeholder="Name your project"/>
+        <FormContainer action="">
+            <DivContainer>
+                <label htmlFor="task">I work in </label>
+                <WorkInput id="task" list="Suggestions" placeholder="de um nome para o seu projeto"/>
+
+                <datalist id="Suggestions">
+                    <option value="">Projeto</option>
+                    <option value="">Projeto</option>
+                </datalist>
 
                 <label htmlFor="minutesAmount">During</label>
-                <input id="minutesAmount" type="number" placeholder="- 00 +"/>
+                <MinutesInput id="minutesAmount" type="number" placeholder="00" step={5} min={5} max={60}/>
 
                 <span>Minutos</span>
-            </div>
+            </DivContainer>
 
-            <div className="clock">
-                <span>0</span>
-                <span>0</span>
+            <ClockContainer>
+                <SpanMinutes>0</SpanMinutes>
+                <SpanMinutes>0</SpanMinutes>
 
-                <span className="spar">:</span>
+                <SpanTwoPoints>:</SpanTwoPoints>
 
-                <span>0</span>
-                <span>0</span>
-            </div>
+                <SpanMinutes>0</SpanMinutes>
+                <SpanMinutes>0</SpanMinutes>
+            </ClockContainer>
 
-            <button type="submit">
+            <ButtonHome type="submit" >
             <Play size={24} />
                 Começar
-                </button>
-        </form>
+                </ButtonHome>
+        </FormContainer>
         </HomeContainer>
     )
 }
