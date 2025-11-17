@@ -26,5 +26,3 @@ export const GlobalStyles = createGlobalStyle`
     }
     
 `
-
-// definindo estilização global para o projeto
