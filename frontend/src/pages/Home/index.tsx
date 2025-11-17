@@ -11,7 +11,7 @@ import {
   SessionButton,
   SessionsHeader,
 } from "./styles"
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { CyclesContext } from "../../contexts/CyclesContext"
 import { playClickSound } from "../../utils/AudioContext"
 
@@ -40,7 +40,6 @@ export function Home() {
     useContext(CyclesContext)
 
   const [selectedSession, setSelectedSession] = useState<SessionType>("focus")
-  //const audioContextRef = useRef<AudioContext | null>(null)
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
   const selectedSessionData = useMemo(() => SESSION_PRESETS[selectedSession], [selectedSession])
