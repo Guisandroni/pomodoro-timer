@@ -6,13 +6,13 @@ export function Header(){
     return(
         
         <HeaderContainer>
-           <img src="https://github.com/Guisandroni.png" alt="" />
+           
             <nav>
                 <NavLink to='/' title="Timer">
                     <Timer size={24} />
                 </NavLink>
 
-                <NavLink to='/history' title="Historic">
+                <NavLink to='/history' title="History">
                     <Scroll size={24}/>
                 </NavLink>
 
