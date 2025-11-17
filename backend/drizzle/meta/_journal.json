@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1763352310471,
+      "tag": "20251117040510_schema_auth_and_cycles",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763359084909,
+      "tag": "20251117055804_schema_deviceId_cyclies",
+      "breakpoints": true
+    }
+  ]
+}
