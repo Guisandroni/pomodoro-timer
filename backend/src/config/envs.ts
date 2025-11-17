@@ -4,7 +4,7 @@ import z from "zod";
 export const envs = {
     app: loadAppEnvs(),
     db: loadDbEnvs(),
-    auth: loadAuthEnvs(),
+   // auth: loadAuthEnvs(),
     }
 
 
@@ -30,13 +30,13 @@ function loadDbEnvs(){
     return schema.parse(process.env)
 }
 
-function loadAuthEnvs(){
-    const schema = z.object({
-        BETTER_AUTH_SECRET: z.string().min(32),
-        BETTER_AUTH_URL: z.url().default('http://localhost:3000'),
-        GOOGLE_CLIENT_ID: z.string(),
-        GOOGLE_CLIENT_SECRET: z.string(),
-    })
+// function loadAuthEnvs(){
+//     const schema = z.object({
+//         BETTER_AUTH_SECRET: z.string().min(32),
+//         BETTER_AUTH_URL: z.url().default('http://localhost:3000'),
+//         GOOGLE_CLIENT_ID: z.string(),
+//         GOOGLE_CLIENT_SECRET: z.string(),
+//     })
 
-    return schema.parse(process.env)
-}
+//     return schema.parse(process.env)
+// }
