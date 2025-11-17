@@ -1,168 +1,197 @@
-import { Play } from "phosphor-react";
-import {  ButtonHome, ClockContainer, HomeContainer, SpanTwoPoints, SpanMinutes, FormContainer, DivContainer, MinutesInput, WorkInput } from "./styles";
-import { useState, useEffect } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Play, HandPalm } from "phosphor-react"
+import {
+  ButtonHome,
+  ClockContainer,
+  HomeContainer,
+  FormContainer,
+  ClockFace,
+  ClockTime,
+  PomodoroFace,
+  SessionTabs,
+  SessionButton,
+  SessionsHeader,
+} from "./styles"
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { CyclesContext } from "../../contexts/CyclesContext"
 
-interface Cycle{
-    id: string
-    task: string
-    minutesAmount: number
-    startDate: Date
-    interruptedDate?: Date
-    finishedDate?: Date
-}
+const SESSION_PRESETS = {
+  focus: {
+    label: "Focus",
+    task: "Focus Session",
+    minutes: 25,
+  },
+  break: {
+    label: "Short Break",
+    task: "Short Break",
+    minutes: 5,
+  },
+  longBreak: {
+    label: "Long Break",
+    task: "Long Break",
+    minutes: 15,
+  },
+} as const
 
-const formaValidationSchema = z.object({
-    task: z.string().min(1, 'Informe a tarefa'),
-    minutesAmount: z.number().min(5, 'O ciclo precisa ser de no mínimo 5 minutos.').max(60, 'O ciclo precisa ser de no máximo 60 minutos.'),
-})
+type SessionType = keyof typeof SESSION_PRESETS
 
-type NewCycleFormData = z.infer<typeof formaValidationSchema>
+export function Home() {
+  const { activeCycleId, markCurrentCycleAsFinished, amountSecondsPassed, setSecondsPassed, createNewCycle, interruptCurrentCycle, cycles } =
+    useContext(CyclesContext)
 
-export function Home(){
+  const [selectedSession, setSelectedSession] = useState<SessionType>("focus")
+  const audioContextRef = useRef<AudioContext | null>(null)
 
-    const [cycles,setCycles] = useState<Cycle[]>([])
-    const [activeCycleId,setActiveCycleId] = useState<string | null>(null)
-    const [ amountSeconds, setAmountSeconds] = useState(0)
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  const selectedSessionData = useMemo(() => SESSION_PRESETS[selectedSession], [selectedSession])
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : selectedSessionData.minutes * 60
 
+  useEffect(() => {
+    let interval: number
 
-    const { register, handleSubmit, watch, reset} = useForm<NewCycleFormData>({
-        resolver: zodResolver(formaValidationSchema),
-        defaultValues: {
-            task: '',
-            minutesAmount: 0,
+    if (activeCycle) {
+      interval = window.setInterval(() => {
+        const secondsDifference = Math.floor((new Date().getTime() - activeCycle.startDate.getTime()) / 1000)
+
+        if (secondsDifference >= totalSeconds) {
+          markCurrentCycleAsFinished()
+          setSecondsPassed(totalSeconds)
+        } else {
+          setSecondsPassed(secondsDifference)
         }
+      }, 1000)
+    }
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [activeCycle, totalSeconds, activeCycleId, markCurrentCycleAsFinished, setSecondsPassed])
+
+  const playClickSound = useCallback(() => {
+    if (typeof window === "undefined") return
+    const AudioContextClass =
+      window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!AudioContextClass) return
+
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContextClass()
+    }
+
+    const ctx = audioContextRef.current
+    if (ctx.state === "suspended") {
+      ctx.resume()
+    }
+
+    const oscillator = ctx.createOscillator()
+    const gainNode = ctx.createGain()
+
+    oscillator.type = "square"
+    oscillator.frequency.setValueAtTime(600, ctx.currentTime)
+    gainNode.gain.setValueAtTime(0.05, ctx.currentTime)
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1)
+
+    oscillator.connect(gainNode)
+    gainNode.connect(ctx.destination)
+
+    oscillator.start()
+    oscillator.stop(ctx.currentTime + 0.1)
+  }, [])
+
+  const handleSelectSession = useCallback(
+    (session: SessionType) => {
+      if (activeCycle) return
+      setSelectedSession(session)
+      playClickSound()
+    },
+    [activeCycle, playClickSound],
+  )
+
+  function handleStartSession() {
+    if (activeCycle) return
+
+    playClickSound()
+    createNewCycle({
+      task: selectedSessionData.task,
+      minutesAmount: selectedSessionData.minutes,
     })
+  }
 
-    
-    function handleCreateNewCycle(data: NewCycleFormData) {
-        const id = String(new Date().getTime())
+  function handleInterruptCycle() {
+    playClickSound()
+    interruptCurrentCycle()
+  }
 
-        const newCycle: Cycle = {
-            id,
-            task: data.task,
-            minutesAmount: data.minutesAmount,
-            startDate: new Date(),
-        }
-        setCycles(state => [...state, newCycle]);
-        setActiveCycleId(id);
-        setAmountSeconds(0);
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : totalSeconds
 
-        reset();
+  const minutesAmount = Math.floor(currentSeconds / 60)
+  const secondsAmount = currentSeconds % 60
+
+  const minutes = String(minutesAmount).padStart(2, "0")
+  const seconds = String(secondsAmount).padStart(2, "0")
+
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds} - ${activeCycle.task}`
+    } else {
+      document.title = `Pomodoro Timer - ${selectedSessionData.label}`
     }
+  }, [minutes, seconds, activeCycle, selectedSessionData.label])
 
-    function handleInterruptCycle(){
-        setCycles(
-            (previousCycles) => previousCycles.map((cycle) => {
-                if(cycle.id === activeCycleId){
-                    return {...cycle, interruptedDate: new Date()}
-                }
-                return cycle
-            })
-        )
-        setActiveCycleId(null)
-    }
+  const progress = activeCycle ? amountSecondsPassed / totalSeconds : 0
+  const progressPercentage = progress * 100
 
-    const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  return (
+    <HomeContainer>
+      <FormContainer>
+        <SessionsHeader>Select a session</SessionsHeader>
+        <SessionTabs>
+          {(Object.keys(SESSION_PRESETS) as SessionType[]).map((sessionKey) => {
+            const session = SESSION_PRESETS[sessionKey]
+            return (
+              <SessionButton
+                key={sessionKey}
+                type="button"
+                $active={selectedSession === sessionKey}
+                disabled={!!activeCycle}
+                onClick={() => handleSelectSession(sessionKey)}
+              >
+                {session.label}
+                <span>{session.minutes} min</span>
+              </SessionButton>
+            )
+          })}
+        </SessionTabs>
 
-    const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
+        <ClockContainer>
+          <ClockFace $progress={progressPercentage}>
+            <PomodoroFace>
+              <div className="eyes">
+                <div className="eye left"></div>
+                <div className="eye right"></div>
+              </div>
+              <div className="mouth"></div>
+            </PomodoroFace>
+            <ClockTime>
+              <span>{minutes[0]}</span>
+              <span>{minutes[1]}</span>
+              <span className="separator">:</span>
+              <span>{seconds[0]}</span>
+              <span>{seconds[1]}</span>
+            </ClockTime>
+          </ClockFace>
+        </ClockContainer>
 
-    useEffect(() => {
-        let interval: number;
-
-        if (activeCycle) {
-            interval = setInterval(() => {
-                const secondsDifference = Math.floor(
-                    (new Date().getTime() - activeCycle.startDate.getTime()) / 1000,
-                )
-
-                if (secondsDifference >= totalSeconds) {
-                    setCycles((state) =>
-                        state.map((cycle) => {
-                            if (cycle.id === activeCycleId) {
-                                return { ...cycle, finishedDate: new Date() }
-                            } else {
-                                return cycle
-                            }
-                        }),
-                    )
-
-                    setAmountSeconds(totalSeconds)
-                    setActiveCycleId(null)
-                } else {
-                    setAmountSeconds(secondsDifference)
-                }
-            }, 1000)
-        }
-
-        return () => {
-            clearInterval(interval)
-        }
-    }, [activeCycle, totalSeconds, activeCycleId])
-
-    const currentSeconds = activeCycle ? totalSeconds - amountSeconds : 0;
-
-    const minutesAmount = Math.floor(currentSeconds / 60)
-    const secondsAmount = currentSeconds % 60
-
-    const minutes = String(minutesAmount).padStart(2, '0')
-    const seconds = String(secondsAmount).padStart(2, '0')
-
-    useEffect(() => {
-        if(activeCycle){
-            document.title = `${minutes}:${seconds}`
-        }
-    }, [minutes, seconds, activeCycle])
-
-
-    const task = watch("task");
-    const isSubmitDisabled = !task;
-
-
-
-    return(
-
-        <HomeContainer>
-        <FormContainer action=" " onSubmit={handleSubmit(handleCreateNewCycle)}>
-            <DivContainer>
-                <label htmlFor="task">I work in </label>
-                <WorkInput id="task" list="Suggestions" placeholder="de um nome para o seu projeto" {...register("task")}/>
-
-                <datalist id="Suggestions">
-                    <option value="">Projeto</option>
-                    <option value="">Projeto</option>
-                </datalist>
-
-                <label htmlFor="minutesAmount">During</label>
-                <MinutesInput id="minutesAmount" type="number" placeholder="00" step={5} min={5} max={60} 
-                {...register("minutesAmount", {valueAsNumber: true})}/>
-
-                <span>Minutos</span>
-            </DivContainer>
-
-            <ClockContainer>
-                <SpanMinutes>{minutes[0]}</SpanMinutes>
-                <SpanMinutes>{minutes[1]}</SpanMinutes>
-
-                <SpanTwoPoints>:</SpanTwoPoints>
-
-                <SpanMinutes>{seconds[0]}</SpanMinutes>
-                <SpanMinutes>{seconds[1]}</SpanMinutes>
-            </ClockContainer>
-
-            { activeCycle ? (
-                <ButtonHome type="button" onClick={handleInterruptCycle}>
-                    Interromper
-                </ButtonHome>
-            ) : (
-                <ButtonHome type="submit" disabled={isSubmitDisabled} >
-                <Play size={24} />
-                    Começar
-                </ButtonHome>
-            )}
-        </FormContainer>
-        </HomeContainer>
-    )
+        {activeCycle ? (
+          <ButtonHome type="button" onClick={handleInterruptCycle} $variant="stop">
+            <HandPalm size={24} />
+            Stop
+          </ButtonHome>
+        ) : (
+          <ButtonHome type="button" onClick={handleStartSession} $variant="start">
+            <Play size={24} />
+            Start
+          </ButtonHome>
+        )}
+      </FormContainer>
+    </HomeContainer>
+  )
 }
