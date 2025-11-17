@@ -13,7 +13,10 @@ function loadAppEnvs(){
         const schema = z.object({
             PORT: z.coerce.number().default(8080),
             CLIENT_URL: z.string().url(),
-            NODE_ENV: z.enum(['dev', 'prod']).default('dev'),
+            NODE_ENV: z.enum(['dev', 'prod','development','production']).transform((val)=>{
+              if (val === 'development') return 'dev';
+              if (val === 'production') return 'prod';
+            }),
         })
 
         return schema.parse(process.env)
