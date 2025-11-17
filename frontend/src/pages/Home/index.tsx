@@ -13,6 +13,7 @@ import {
 } from "./styles"
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { CyclesContext } from "../../contexts/CyclesContext"
+import { playClickSound } from "../../utils/AudioContext"
 
 const SESSION_PRESETS = {
   focus: {
@@ -39,7 +40,7 @@ export function Home() {
     useContext(CyclesContext)
 
   const [selectedSession, setSelectedSession] = useState<SessionType>("focus")
-  const audioContextRef = useRef<AudioContext | null>(null)
+  //const audioContextRef = useRef<AudioContext | null>(null)
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
   const selectedSessionData = useMemo(() => SESSION_PRESETS[selectedSession], [selectedSession])
@@ -66,35 +67,7 @@ export function Home() {
     }
   }, [activeCycle, totalSeconds, activeCycleId, markCurrentCycleAsFinished, setSecondsPassed])
 
-  const playClickSound = useCallback(() => {
-    if (typeof window === "undefined") return
-    const AudioContextClass =
-      window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-    if (!AudioContextClass) return
-
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContextClass()
-    }
-
-    const ctx = audioContextRef.current
-    if (ctx.state === "suspended") {
-      ctx.resume()
-    }
-
-    const oscillator = ctx.createOscillator()
-    const gainNode = ctx.createGain()
-
-    oscillator.type = "square"
-    oscillator.frequency.setValueAtTime(600, ctx.currentTime)
-    gainNode.gain.setValueAtTime(0.05, ctx.currentTime)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1)
-
-    oscillator.connect(gainNode)
-    gainNode.connect(ctx.destination)
-
-    oscillator.start()
-    oscillator.stop(ctx.currentTime + 0.1)
-  }, [])
+  
 
   const handleSelectSession = useCallback(
     (session: SessionType) => {
@@ -102,7 +75,7 @@ export function Home() {
       setSelectedSession(session)
       playClickSound()
     },
-    [activeCycle, playClickSound],
+    [activeCycle],
   )
 
   function handleStartSession() {
