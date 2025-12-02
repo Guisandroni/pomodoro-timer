@@ -4,6 +4,7 @@ import styled from "styled-components";
 export const HistoryContainer = styled.div`
     flex:1;
     padding: 3.5rem;
+    background-color: ${(props) => props.theme.white};
 
     display:flex;
     flex-direction:column;
@@ -76,7 +77,8 @@ export const HistoryTable = styled.div`
         }
 
         th{
-            background-color: ${props=> props.theme["gray-600"]};
+            background-color: ${(props)=> props.theme["gray-100"]};
+            color: ${(props)=> props.theme["gray-900"]};
             padding:1rem;
             text-align:start;
             font-size: 0.89rem;
@@ -112,8 +114,9 @@ export const HistoryTable = styled.div`
         }
 
         td{
-            background-color: ${props=> props.theme["gray-600"]};
-            border-top: 4px solid ${props=> props.theme["gray-800"]};
+            background-color: ${(props)=> props.theme.white};
+            color: ${(props)=> props.theme["gray-900"]};
+            border-top: 1px solid ${(props)=> props.theme["gray-200"]};
             padding: 1rem;
             font-size: 0.89rem;
             line-height: 1.6;
