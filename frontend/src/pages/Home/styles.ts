@@ -66,7 +66,7 @@ export const SessionButton = styled.button<{ $active: boolean }>`
   border: none;
   border-radius: 999px;
   padding: 0.75rem 1.5rem;
-  background-color: ${(props) => (props.$active ? props.theme["gray-900"] : props.theme["gray-100"])};
+  background-color: ${(props) => (props.$active ? props.theme["gray-900"] : props.theme.white)};
   color: ${(props) => (props.$active ? props.theme.white : props.theme["gray-900"])};
   font-weight: bold;
   cursor: pointer;

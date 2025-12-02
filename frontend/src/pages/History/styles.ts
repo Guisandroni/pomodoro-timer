@@ -80,12 +80,13 @@ export const HistoryTable = styled.div`
         }
 
         th{
-            background-color: ${(props)=> props.theme["gray-100"]};
+            background-color: ${(props)=> props.theme.white};
             color: ${(props)=> props.theme["gray-800"]};
             padding:1rem;
             text-align:start;
             font-size: 0.89rem;
             line-height: 1.6;
+            border-bottom: 1px solid ${(props)=> props.theme["gray-200"]};
 
             @media (max-width: 768px) {
                 padding: 0.75rem;
