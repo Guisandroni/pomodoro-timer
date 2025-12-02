@@ -30,7 +30,7 @@ export const HeaderContainer = styled.div`
             justify-content:center;
             align-items:center;
 
-            color: ${props => props.theme["gray-100"]};
+            color: ${props => props.theme["gray-800"]};
 
             border-top: 3px solid transparent;
             border-bottom: 3px solid transparent;
@@ -43,7 +43,7 @@ export const HeaderContainer = styled.div`
             }
 
             &:hover{
-                border-bottom: 3px solid ${props => props.theme["green-500"]};
+                border-bottom: 3px solid ${props => props.theme["gray-800"]};
 
                 @media (max-width: 480px) {
                     border-bottom-width: 2px;
@@ -51,7 +51,7 @@ export const HeaderContainer = styled.div`
             }
 
             &.active{
-                color: ${props => props.theme["green-500"]}
+                color: ${props => props.theme["gray-900"]};
             }
         }
     }

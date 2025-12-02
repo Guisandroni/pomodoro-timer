@@ -10,7 +10,8 @@ export const HistoryContainer = styled.div`
    
     h1{
         font-size: 1.5rem;
-        color: ${props=> props.theme["gray-100"]};
+        color: ${props=> props.theme["gray-900"]};
+        font-weight: 700;
     }
 
     @media (max-height: 642px) {

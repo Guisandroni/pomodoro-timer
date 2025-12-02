@@ -6,10 +6,8 @@ import {
   FormContainer,
   ClockFace,
   ClockTime,
-  PomodoroFace,
   SessionTabs,
   SessionButton,
-  SessionsHeader,
 } from "./styles"
 import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { CyclesContext } from "../../contexts/CyclesContext"
@@ -114,7 +112,6 @@ export function Home() {
   return (
     <HomeContainer>
       <FormContainer>
-        <SessionsHeader>Select a session</SessionsHeader>
         <SessionTabs>
           {(Object.keys(SESSION_PRESETS) as SessionType[]).map((sessionKey) => {
             const session = SESSION_PRESETS[sessionKey]
@@ -135,13 +132,6 @@ export function Home() {
 
         <ClockContainer>
           <ClockFace $progress={progressPercentage}>
-            <PomodoroFace>
-              <div className="eyes">
-                <div className="eye left"></div>
-                <div className="eye right"></div>
-              </div>
-              <div className="mouth"></div>
-            </PomodoroFace>
             <ClockTime>
               <span>{minutes[0]}</span>
               <span>{minutes[1]}</span>

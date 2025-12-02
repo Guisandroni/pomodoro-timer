@@ -41,7 +41,8 @@ export const DivContainer = styled.div`
 `;
 
 export const SessionsHeader = styled.span`
-  color: ${(props) => props.theme["gray-100"]};
+  color: ${(props) => props.theme["gray-900"]};
+  font-weight: 700;
 `;
 
 export const SessionTabs = styled.div`
@@ -65,8 +66,8 @@ export const SessionButton = styled.button<{ $active: boolean }>`
   border: none;
   border-radius: 999px;
   padding: 0.75rem 1.5rem;
-  background-color: ${(props) => (props.$active ? props.theme["gray-100"] : props.theme["gray-700"])};
-  color: ${(props) => (props.$active ? props.theme["gray-900"] : props.theme["gray-100"])};
+  background-color: ${(props) => (props.$active ? props.theme["gray-900"] : props.theme["gray-100"])};
+  color: ${(props) => (props.$active ? props.theme.white : props.theme["gray-900"])};
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -79,7 +80,7 @@ export const SessionButton = styled.button<{ $active: boolean }>`
   span {
     font-size: 0.75rem;
     font-weight: 500;
-    color: ${(props) => (props.$active ? props.theme["gray-600"] : props.theme["gray-300"])};
+    color: ${(props) => (props.$active ? props.theme["gray-100"] : props.theme["gray-500"])};
   }
 
   &:disabled {
@@ -105,18 +106,20 @@ interface ButtonHomeProps {
 }
 
 export const ButtonHome = styled.button<ButtonHomeProps>`
-  background-color: ${(props) => 
-    props.$variant === "stop" 
-      ? props.theme["red-500"] 
-      : props.theme["green-700"]
-  };
-  &:focus{outline: 0; box-shadow: 0 0 0 2px ${props => props.$variant === "stop" ? props.theme["red-500"] : props.theme["green-500"]}}
+  background-color: ${(props) =>
+    props.$variant === "stop"
+      ? props.theme["gray-900"]
+      : props.theme["gray-800"]};
+  &:focus{
+    outline: 0; 
+    box-shadow: 0 0 0 2px ${props => props.theme["gray-700"]};
+  }
   border: none;
   border-radius: 8px;
   width: 100%;
   max-width: 400px;
   padding: 1rem 0;
-  color: ${(props) => props.theme.white};
+  color: ${(props) => props.theme["gray-100"]};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -134,11 +137,10 @@ export const ButtonHome = styled.button<ButtonHomeProps>`
   &:not(:disabled):hover {
     &:active{outline: none}
 
-    background-color: ${(props) => 
-      props.$variant === "stop" 
-        ? props.theme["red-700"] 
-        : props.theme["green-500"]
-    };
+    background-color: ${(props) =>
+      props.$variant === "stop"
+        ? props.theme["gray-800"]
+        : props.theme["gray-700"]};
   }
 
   @media (max-width: 768px) {
@@ -168,184 +170,46 @@ interface ClockFaceProps {
 
 export const ClockFace = styled.div<ClockFaceProps>`
   position: relative;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: ${(props) => props.theme["gray-700"]};
+  width: 100%;
+  max-width: 520px;
+  height: 180px;
+  border-radius: 16px;
+  background: ${(props) => props.theme["gray-900"]};
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 
-    0 0 0 8px ${(props) => props.theme["gray-600"]},
-    0 0 0 16px ${(props) => props.theme["gray-800"]},
-    inset 0 0 40px rgba(0, 0, 0, 0.3);
-  
-  /* Anel de progresso */
-  &::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    width: calc(100% + 16px);
-    height: calc(100% + 16px);
-    border-radius: 50%;
-    background: conic-gradient(
-      from 0deg,
-      ${(props) => props.theme["green-500"]} 0%,
-      ${(props) => props.theme["green-500"]} ${(props) => props.$progress}%,
-      ${(props) => props.theme["gray-600"]} ${(props) => props.$progress}%,
-      ${(props) => props.theme["gray-600"]} 100%
-    );
-    z-index: -1;
-    transition: background 0.3s ease;
-  }
+  /* sombra suave para destacar o timer sem criar sensação de cartão separado do layout */
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.25),
+    0 8px 18px rgba(0, 0, 0, 0.18);
 
   @media (max-height: 642px) {
-    width: 300px;
-    height: 300px;
+    height: 150px;
   }
 
   @media (max-width: 768px) {
-    width: 300px;
-    height: 300px;
+    height: 150px;
   }
 
   @media (max-width: 480px) {
-    width: 250px;
-    height: 250px;
-  }
-`;
-
-export const PomodoroFace = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px;
-  height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-
-  .eyes {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 20px;
-  }
-
-  .eye {
-    width: 20px;
-    height: 20px;
-    background-color: ${(props) => props.theme["gray-100"]};
-    border-radius: 50%;
-    position: relative;
-    animation: blink 4s infinite;
-
-    &.left {
-      animation-delay: 0s;
-    }
-
-    &.right {
-      animation-delay: 0.1s;
-    }
-
-    @keyframes blink {
-      0%, 90%, 100% {
-        height: 20px;
-      }
-      95% {
-        height: 2px;
-      }
-    }
-  }
-
-  .mouth {
-    width: 60px;
-    height: 30px;
-    border: 3px solid ${(props) => props.theme["gray-100"]};
-    border-top: none;
-    border-radius: 0 0 60px 60px;
-    margin-top: 10px;
-  }
-
-  @media (max-height: 642px) {
-    width: 150px;
-    height: 150px;
-
-    .eyes {
-      gap: 30px;
-      margin-bottom: 15px;
-    }
-
-    .eye {
-      width: 15px;
-      height: 15px;
-    }
-
-    .mouth {
-      width: 45px;
-      height: 22px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    width: 150px;
-    height: 150px;
-
-    .eyes {
-      gap: 30px;
-      margin-bottom: 15px;
-    }
-
-    .eye {
-      width: 15px;
-      height: 15px;
-    }
-
-    .mouth {
-      width: 45px;
-      height: 22px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    width: 120px;
-    height: 120px;
-
-    .eyes {
-      gap: 24px;
-      margin-bottom: 12px;
-    }
-
-    .eye {
-      width: 12px;
-      height: 12px;
-    }
-
-    .mouth {
-      width: 36px;
-      height: 18px;
-    }
+    height: 130px;
   }
 `;
 
 export const ClockTime = styled.div`
-  position: absolute;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   font-family: "Roboto Mono", monospace;
-  font-size: 5rem;
+  font-size: 4.5rem;
   font-weight: bold;
   color: ${(props) => props.theme["gray-100"]};
+  text-shadow:
+    0 0 5px ${(props) => props.theme["gray-900"]},
+    0 0 10px ${(props) => props.theme["gray-900"]},
+    0 0 20px ${(props) => props.theme["gray-700"]};
 
   span {
     display: inline-block;
@@ -354,7 +218,7 @@ export const ClockTime = styled.div`
   }
 
   .separator {
-    color: ${(props) => props.theme["green-500"]};
+    color: ${(props) => props.theme["gray-300"]};
     animation: pulse 1s infinite;
   }
 
@@ -369,17 +233,14 @@ export const ClockTime = styled.div`
 
   @media (max-height: 642px) {
     font-size: 3.5rem;
-    bottom: 60px;
   }
 
   @media (max-width: 768px) {
     font-size: 3.5rem;
-    bottom: 60px;
   }
 
   @media (max-width: 480px) {
     font-size: 2.5rem;
-    bottom: 50px;
     gap: 0.25rem;
   }
 `;
