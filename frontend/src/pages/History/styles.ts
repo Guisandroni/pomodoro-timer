@@ -44,6 +44,9 @@ export const HistoryTable = styled.div`
     flex:1;
     overflow: auto;
     margin-top:2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    background-color: ${(props) => props.theme.white};
 
     @media (max-height: 642px) {
         margin-top: 1rem;
@@ -78,7 +81,7 @@ export const HistoryTable = styled.div`
 
         th{
             background-color: ${(props)=> props.theme["gray-100"]};
-            color: ${(props)=> props.theme["gray-900"]};
+            color: ${(props)=> props.theme["gray-800"]};
             padding:1rem;
             text-align:start;
             font-size: 0.89rem;
@@ -95,7 +98,7 @@ export const HistoryTable = styled.div`
             }
 
             &:first-child{
-                border-top-left-radius: 8px;
+                border-top-left-radius: 12px;
                 padding-left: 1.5rem;
 
                 @media (max-width: 480px) {
@@ -104,7 +107,7 @@ export const HistoryTable = styled.div`
             }
 
             &:last-child{
-                border-top-right-radius: 8px;
+                border-top-right-radius: 12px;
                 padding-left: 1.5rem;
 
                 @media (max-width: 480px) {

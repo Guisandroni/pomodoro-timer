@@ -56,7 +56,7 @@ export function History() {
             <table>
               <thead>
                 <tr>
-                  <th>Project</th>
+                  <th>Session</th>
                   <th>Duration</th>
                   <th>Started</th>
                   <th>Status</th>
